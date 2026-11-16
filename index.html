@@ -146,7 +146,7 @@ body.view .weekbar,body.view #tabs{display:none}
   <header class="top">
     <h1>카쿰 정산기<small>카오스 자쿰 공대 판매 정산</small></h1>
     <div class="weekbar">
-      <label class="mgrtop">정산 담당자<input id="mgrTop" class="in" list="dlNames" data-f="settings.manager" data-rr="1" placeholder="예: 닉네임" autocomplete="off"></label>
+      <label class="mgrtop">정산 담당자<input id="mgrTop" class="in" list="dlNames" data-f="settings.manager" data-rr="1" placeholder="예: 표웅식" autocomplete="off"></label>
       <select id="weekSel" class="in" style="width:auto;background:var(--surface);border:1px solid var(--line)" aria-label="회차 선택"></select>
       <button class="btn pri" data-act="newWeek">새 회차</button>
       <button class="btn" id="shareBtn" data-act="shareSnap" hidden>공유 갱신</button>
@@ -323,12 +323,63 @@ function sampleWeek(){
     purchases:[]
   };
 }
-const SEED_ID='seed-sample';
-const ALL_SEEDS=['bp-1115', 'cat-eq-v1', 'cat-eq-v2', 'ch-1115', 'cs-1115', 'eq-1115', 'mk-1115', 'p3-1115', 'pt-1115', 'tt-1115', 'tt2-1115'];
-function seedWeek1115(){ const s=sampleWeek(); s.id=SEED_ID; return s; }
+const SEED_ID='seed-1115-v2';
+function seedWeek1115(){
+  const order=[['킹퐁핑퐁','히어로'],['꼴동','히어로'],['효탄','히어로'],['새싹대장님','바이퍼'],['좌우중간','다크나이트'],
+    ['뀨쀼토','팔라딘'],['의적섀도어','섀도어'],['전사설계사','다크나이트'],['국또죽','다크나이트(부캐)'],['하니뀽','나이트로드'],
+    ['수비표창수저','나이트로드'],['밍또깅표도','나이트로드'],['표웅식','나이트로드'],['스킬이뭐에용','나이트로드'],['고삼면','나이트로드'],
+    ['최쭌규','비숍'],['XingXing','신궁'],['토벤이국룰','보우마스터'],['달이잠든바다','비숍'],['쿠리니','비숍'],['뀨잉꾸잉','비숍']];
+  return {
+    id:SEED_ID,label:'11월 15일 회차',payer:'',
+    settings:Object.assign(emptySettings(),{manager:'표웅식'}),
+    members:order.map(x=>newMember(x[0],x[1],'공대원')),
+    sales:[
+      {item:'확정 투구',trt:'1',method:'직접 교환',qty:1,unit:60000000,holder:'',note:'1순위 홋비'},
+      {item:'확정 투구',trt:'1',method:'직접 교환',qty:1,unit:60000000,holder:'',note:'2순위 축축한양말'},
+      {item:'확정 투구',trt:'2',method:'직접 교환',qty:1,unit:60000000,holder:'',note:'1순위 평택안마방'},
+      {item:'확정 투구',trt:'2',method:'직접 교환',qty:1,unit:60000000,holder:'',note:'2순위 뗸뗸 불참(환불 없음), 투구는 국또죽 부캐가 500만에 구매해 뗸뗸에게 반환 (표웅식 선송금, 국또죽 후불)'},
+      {item:'장비 상점 판매',trt:'1',method:'상점·직접',qty:1,unit:1880000,holder:'',note:'메투스, 클로니안 엑스, 카사 크로우, 케이그, 코브라스티어'},
+      {item:'장비 상점 판매',trt:'2',method:'상점·직접',qty:1,unit:2860000,holder:'',note:'커세어, 피나카, 레드 크리븐, 라 투핸더, 다크 샬리트, 비펜니스, 페어프로즌'},
+      {item:'[마북] 메테오 20',trt:'1',method:'거래소',qty:1,unit:1027,holder:'',note:''},
+      {item:'[마북] 인레이지 20',trt:'1',method:'거래소',qty:1,unit:2534,holder:'',note:''},
+      {item:'[마북] 베놈 30',trt:'1',method:'거래소',qty:1,unit:21447,holder:'',note:''},
+      {item:'투구 지력 주문서 10%',trt:'2',method:'거래소',qty:1,unit:740000,holder:'',note:''},
+      {item:'혼돈의 주문서',trt:'1',method:'거래소',qty:1,unit:15999999,holder:'',note:'60%'},
+      {item:'혼돈의 주문서',trt:'2',method:'거래소',qty:1,unit:15999999,holder:'',note:'60%'},
+      {item:'순록의 우유',trt:'1',method:'거래소',qty:68,unit:5298,holder:'',note:''},
+      {item:'엘릭서',trt:'1',method:'거래소',qty:49,unit:7310,holder:'',note:''},
+      {item:'파워 엘릭서',trt:'1',method:'거래소',qty:36,unit:14150,holder:'',note:''},
+      {item:'황혼의 이슬',trt:'1',method:'거래소',qty:61,unit:7140,holder:'',note:''},
+      {item:'순록의 우유',trt:'2',method:'거래소',qty:61,unit:5298,holder:'',note:''},
+      {item:'엘릭서',trt:'2',method:'거래소',qty:47,unit:7310,holder:'',note:''},
+      {item:'파워 엘릭서',trt:'2',method:'거래소',qty:44,unit:14150,holder:'',note:''},
+      {item:'황혼의 이슬',trt:'2',method:'거래소',qty:67,unit:7140,holder:'',note:''},
+      {item:'3순위 투구',trt:'1',method:'직접 교환',qty:1,unit:25000000,holder:'',note:'버섴뀽 (하니뀽 지인), 알버프 400만 차감 후 입금'},
+      {item:'3순위 투구',trt:'2',method:'직접 교환',qty:1,unit:25000000,holder:'',note:'TheEnd (수비표창수저 지인), 11월 8일 분배금에서 선차감'}
+    ],
+    expenses:[
+      {type:'실비',name:'알버프 구입 (판매자 버섴뀽)',to:'',amount:4000000,base:0,note:'미지급, 3순위 투구 획득 시 대금에서 차감'},
+      {type:'실비',name:'영메 구입 (판매자 포도알2개)',to:'표웅식',amount:0,base:0,note:'환급액 미정'},
+      {type:'구인',name:'구인 인센 (홋비)',to:'좌우중간',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
+      {type:'구인',name:'구인 인센 (축축한양말)',to:'토벤이국룰',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
+      {type:'구인',name:'구인 인센 (평택안마방)',to:'토벤이국룰',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
+      {type:'구인',name:'구인 인센 (뗸뗸)',to:'의적섀도어',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
+      {type:'뿌리기',name:'뿌리기 (효탄 6개)',to:'효탄',amount:3000000,base:0,note:'개당 50만 × 6'},
+      {type:'뿌리기',name:'뿌리기 (하니뀽 2개)',to:'하니뀽',amount:1000000,base:0,note:'개당 50만 × 2'}
+    ],
+    purchases:[],
+    memo:'내판 방식: 공대원 지인은 당일 시세의 50% 가격으로 투구 구매\n3순위 투구 오늘 시세 5,000만, 지인가 2,500만 (드랍은 확률, 드랍될 때만 판매, 구인 인센 없음)\n1트 손님 버섴뀽 (하니뀽 지인), 2트 손님 TheEnd (수비표창수저 지인)\n알버프 400만은 버섴뀽의 투구 대금에서 차감 (현재 지급·수령 없음, 투구 획득 시 버섴뀽 입금 2,100만)\n영메(영웅의메아리): 표웅식이 별도 구입 (판매자 포도알2개)\n손님 입장: 1~3번 (1번 원정대장)'
+  };
+}
+function blankWeek(label,from){
+  const w={id:uid(),label:label,payer:'',settings:from?JSON.parse(JSON.stringify(from.settings)):emptySettings(),
+    members:[],sales:[],expenses:[],purchases:[],memo:''};
+  if(from) w.members=from.members.map(m=>Object.assign({},m,{r1:100,r2:100,adjust:0,paid:false}));
+  return w;
+}
 function initial(){
   const w=seedWeek1115();
-  return {v:1,cur:w.id,weeks:[w],seedsDone:ALL_SEEDS.concat([SEED_ID]),catalog:DEFAULT_CATALOG.map(x=>Object.assign({last:0},x))};
+  return {v:1,cur:w.id,weeks:[w],seedsDone:[SEED_ID],catalog:DEFAULT_CATALOG.map(x=>Object.assign({last:0},x))};
 }
 function load(){
   try{
@@ -370,7 +421,95 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
     if(untouched) S.weeks=S.weeks.filter(w=>w.id!=='seed-1115');
     const sw=seedWeek1115(); S.weeks.push(sw); S.cur=sw.id; S.seedsDone.push(SEED_ID); changed=true;
   }
-
+  const w2=S.weeks.find(w=>w.id===SEED_ID);
+  if(w2){
+    const e0=w2.expenses[0];
+    if(e0 && e0.name==='알버프 구입 실비' && e0.to==='표웅식' && num(e0.amount)===4000000){
+      e0.name='알버프 구입 (판매자 버섴뀽)'; e0.to=''; e0.note='미지급, 3순위 투구 획득 시 대금에서 차감'; changed=true;
+    }
+    if(w2.memo==='내판 방식: 공대원 지인은 시세의 50% 할인가로 투구 구매\n3순위 1순번: 하니뀽의 지인 버섴뀽 (알버프 판매자)\n3순위 2순번: 수비표창수저의 지인 TheEnd\n알버프: 400만 메소에 구매\n영메(영웅의메아리): 표웅식이 별도로 구입 (포도알 2개)\n확정 투구 1트: 1순위 빈타니, 정가 구매, 구인자 좌우중간\n손님 입장: 1~3번 (1번 원정대장)'){ w2.memo=seedWeek1115().memo; changed=true; }
+    const s0=w2.sales[0];
+    if(w2.sales.length===1 && s0 && s0.note==='1순위 빈타니, 정가 구매, 구인자 좌우중간' && !num(s0.unit)){
+      w2.sales=seedWeek1115().sales; changed=true;
+    }
+    w2.sales.forEach(r=>{
+      if(r.note==='1순위 홋비, 구인자 좌우중간'){ r.note='1순위 홋비'; changed=true; }
+      if(r.note==='2순위 callmeeloy2385(디스코드 닉네임), 구인자 토벤이국룰'){ r.note='2순위 callmeeloy2385 (디스코드 닉네임)'; changed=true; }
+    });
+    if(typeof w2.memo==='string' && w2.memo.indexOf('확정 투구 1트: 1순위 홋비 (구인자')>=0){
+      w2.memo=w2.memo.split('\n').filter(l=>l.indexOf('확정 투구 1트: 1순위 홋비 (구인자')<0).join('\n'); changed=true;
+    }
+    w2.sales.forEach(r=>{ if(r.item==='확정 투구' && r.method!=='직접 교환' && !num(r.unit) && /^[12]순위 /.test(r.note||'')){ r.method='직접 교환'; changed=true; } });
+    const cj=S.catalog.find(x=>x.n==='확정 투구'); if(cj && cj.m!=='직접 교환' && !cj.last){ cj.m='직접 교환'; changed=true; }
+    w2.expenses.forEach(e=>{ if(e.name==='영메 구입 실비' && e.note==='포도알 2개로 별도 구입, 환급액 미정'){ e.name='영메 구입 (판매자 포도알2개)'; e.note='환급액 미정'; changed=true; } });
+    if(typeof w2.memo==='string' && w2.memo.indexOf('표웅식이 별도 구입 (포도알 2개)')>=0){ w2.memo=w2.memo.split('표웅식이 별도 구입 (포도알 2개)').join('표웅식이 별도 구입 (판매자 포도알2개)'); changed=true; }
+    if(!S.seedsDone.includes('pt-1115')){
+      S.seedsDone.push('pt-1115'); changed=true;
+      if(!w2.sales.some(r=>/평택안마방/.test(r.note||''))){
+        const ss=seedWeek1115();
+        w2.sales.push(ss.sales.find(r=>/평택안마방/.test(r.note||'')));
+        w2.expenses.push(ss.expenses.find(e=>/평택안마방/.test(e.name||'')));
+      }
+    }
+    if(!S.seedsDone.includes('p3-1115')){
+      S.seedsDone.push('p3-1115'); changed=true;
+      const ss=seedWeek1115();
+      w2.sales.forEach(r=>{ if(r.item==='확정 투구' && !num(r.unit) && /^[12]순위 /.test(r.note||'')) r.unit=60000000; });
+      w2.expenses.forEach(e=>{ if(e.type==='구인' && !num(e.base) && /홋비|callmeeloy2385/.test(e.name||'')) e.base=60000000; });
+      if(!w2.sales.some(r=>r.item==='3순위 투구')) ss.sales.filter(r=>r.item==='3순위 투구').forEach(r=>w2.sales.push(r));
+    }
+    w2.sales.forEach(r=>{ if(r.item==='3순위 투구' && r.note==='TheEnd (수비표창수저 지인), 분배금에서 차감'){ r.note='TheEnd (수비표창수저 지인), 11월 8일 분배금에서 선차감'; changed=true; } });
+    { const n0=w2.purchases.length;
+      w2.purchases=w2.purchases.filter(p=>!(String(p.buyer||'').trim()==='수비표창수저' && num(p.amount)===25000000 && p.note==='TheEnd 3순위 투구 대금'));
+      if(w2.purchases.length!==n0) changed=true; }
+    w2.sales.forEach(r=>{ if(r.note==='2순위 callmeeloy2385 (디스코드 닉네임)'){ r.note='2순위 축축한양말'; changed=true; } });
+    w2.expenses.forEach(e=>{ if(e.name==='구인 인센 (callmeeloy2385)'){ e.name='구인 인센 (축축한양말)'; changed=true; } });
+    if(!S.seedsDone.includes('tt-1115')){
+      S.seedsDone.push('tt-1115'); changed=true;
+      if(!w2.sales.some(r=>/뗸뗸/.test(r.note||''))){
+        const row=seedWeek1115().sales.find(r=>/뗸뗸/.test(r.note||'')); if(row) w2.sales.push(row);
+      }
+    }
+    if(!S.seedsDone.includes('tt2-1115')){
+      S.seedsDone.push('tt2-1115'); changed=true;
+      const ss=seedWeek1115();
+      w2.sales.forEach(r=>{ if(r.note==='2순위 뗸뗸 불참, 국또죽 부캐가 구매 (대금 후불)'){ const n=ss.sales.find(x=>/뗸뗸/.test(x.note||'')); r.unit=n.unit; r.note=n.note; } });
+      if(!w2.expenses.some(e=>/뗸뗸/.test(e.name||''))){ const x=ss.expenses.find(e=>/뗸뗸/.test(e.name||'')); if(x) w2.expenses.push(x); }
+    }
+    if(!S.seedsDone.includes('eq-1115')){
+      S.seedsDone.push('eq-1115'); changed=true;
+      if(!w2.sales.some(r=>r.item==='장비 상점 판매')) seedWeek1115().sales.filter(r=>r.item==='장비 상점 판매').forEach(r=>w2.sales.push(r));
+    }
+    if(!S.seedsDone.includes('mk-1115')){
+      S.seedsDone.push('mk-1115'); changed=true;
+      const have=n=>w2.sales.some(r=>String(r.item).replace(/\s+/g,'')===n.replace(/\s+/g,''));
+      seedWeek1115().sales.filter(r=>['[마북] 메테오 20','[마북] 인레이지 20','[마북] 베놈 30','투구 지력 주문서 10%'].includes(r.item)).forEach(r=>{ if(!have(r.item)) w2.sales.push(r); });
+    }
+    if(!S.seedsDone.includes('bp-1115')){
+      S.seedsDone.push('bp-1115'); changed=true;
+      seedWeek1115().expenses.filter(e=>e.type==='뿌리기').forEach(e=>{
+        if(!w2.expenses.some(x=>x.name===e.name)) w2.expenses.push(e);
+      });
+    }
+    if(!S.seedsDone.includes('ch-1115')){
+      S.seedsDone.push('ch-1115'); changed=true;
+      seedWeek1115().sales.filter(r=>r.item==='혼돈의 주문서').forEach(r=>{
+        if(!w2.sales.some(x=>x.item===r.item && String(x.trt)===String(r.trt))) w2.sales.push(r);
+      });
+    }
+    if(!S.seedsDone.includes('cs-1115')){
+      S.seedsDone.push('cs-1115'); changed=true;
+      const cons=['순록의 우유','엘릭서','파워 엘릭서','황혼의 이슬'];
+      seedWeek1115().sales.filter(r=>cons.includes(r.item)).forEach(r=>{
+        if(!w2.sales.some(x=>x.item===r.item && String(x.trt)===String(r.trt))) w2.sales.push(r);
+      });
+    }
+    const ri=w2.expenses.findIndex(e=>e.name==='구인 인센 (빈타니)');
+    if(ri>=0 && !num(w2.expenses[ri].base)){
+      w2.expenses.splice.apply(w2.expenses,[ri,1].concat(seedWeek1115().expenses.filter(e=>e.type==='구인'))); changed=true;
+    }
+    if(w2.memo==='내판 방식: 공대원 지인은 당일 시세의 50% 가격으로 투구 구매\n3순위 투구 오늘 시세 5,000만, 지인가 2,500만 (드랍은 확률, 드랍될 때만 판매)\n1트 손님 버섴뀽 (하니뀽 지인), 2트 손님 TheEnd (수비표창수저 지인)\n알버프 400만은 버섴뀽의 투구 대금에서 차감 (현재 지급·수령 없음, 투구 획득 시 버섴뀽 입금 2,100만)\n영메(영웅의메아리): 표웅식이 별도 구입 (판매자 포도알2개)\n확정 투구 1트: 1순위 빈타니, 정가 구매, 구인자 좌우중간\n손님 입장: 1~3번 (1번 원정대장)'){ w2.memo=seedWeek1115().memo; changed=true; }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
@@ -810,7 +949,7 @@ function importState(text){
   try{
     const s=JSON.parse(text);
     if(!validState(s)){ toast('올바른 백업이 아닙니다.'); return false; }
-    S=s; if(!Array.isArray(S.seedsDone)) S.seedsDone=ALL_SEEDS.concat([SEED_ID]);
+    S=s; if(!Array.isArray(S.seedsDone)) S.seedsDone=[SEED_ID];
     if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
     save(); render(); toast('복원했습니다.'); return true;
   }catch(e){ toast('백업을 읽지 못했습니다.'); return false; }
@@ -869,7 +1008,7 @@ document.addEventListener('click',e=>{
     case 'restoreApply': if(importState($('#restoreTa').value)) closeModal(); break;
     case 'wipe':{
       const nw=blankWeek(todayLabel()+' 회차',null);
-      S={v:1,cur:nw.id,weeks:[nw],seedsDone:ALL_SEEDS.concat([SEED_ID]),catalog:DEFAULT_CATALOG.map(x=>Object.assign({last:0},x))};
+      S={v:1,cur:nw.id,weeks:[nw],seedsDone:[SEED_ID],catalog:DEFAULT_CATALOG.map(x=>Object.assign({last:0},x))};
       save(); render(); toast('초기화했습니다.'); break; }
   }
 });
