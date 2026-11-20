@@ -138,7 +138,10 @@ function calc(w){
   const sprinkles=w.sprinkles.map(p=>Object.assign({},p,{amount:Math.round(num(p.count)*num(s.sprinklePrice))}));
   const spTotal=sum(sprinkles,p=>p.amount);
   const mode='pool';
-  const budget=total-spTotal;
+  const bonusBy={};
+  w.members.forEach(m=>{ const n=String(m.name||'').trim(); const b=num(m.bonus); if(n && b && m.status!=='불참') bonusBy[n]=(bonusBy[n]||0)+b; });
+  const bonusTotal=sum(Object.keys(bonusBy),k=>bonusBy[k]);
+  const budget=total-spTotal-bonusTotal;
   const att=w.members.filter(m=>m.status==='분배' && String(m.name||'').trim());
   const S1=sum(att,m=>pct(m.rate));
   const unit=S1>0?budget/S1:0;
@@ -147,18 +150,18 @@ function calc(w){
   const rows=att.map((m,i)=>{
     const name=String(m.name).trim();
     const share=Math.floor(unit*pct(m.rate)+1e-6);
-    const spay=spBy[name]||0;
-    return {no:i+1,mi:w.members.indexOf(m),name:name,party:m.party||'',rate:num(m.rate),share:share,spay:spay,net:share+spay,paid:!!m.paid};
+    const spay=spBy[name]||0, bonus=bonusBy[name]||0;
+    return {no:i+1,mi:w.members.indexOf(m),name:name,party:m.party||'',rate:num(m.rate),share:share,spay:spay,bonus:bonus,net:share+spay+bonus,paid:!!m.paid};
   });
   const inDist=new Set(rows.map(r=>r.name));
   const owe=[];
-  Object.keys(spBy).forEach(n=>{
+  Object.keys(Object.assign({},spBy,bonusBy)).forEach(n=>{
     if(inDist.has(n)) return;
     const mm=w.members.find(m=>String(m.name||'').trim()===n);
-    owe.push({name:n,amount:spBy[n],mi:mm?w.members.indexOf(mm):-1,party:mm?(mm.party||''):'',paid:!!(mm&&mm.paid)});
+    owe.push({name:n,amount:(spBy[n]||0)+(bonusBy[n]||0),spay:spBy[n]||0,bonus:bonusBy[n]||0,mi:mm?w.members.indexOf(mm):-1,party:mm?(mm.party||''):'',paid:!!(mm&&mm.paid)});
   });
   const distributed=sum(rows,r=>r.share);
-  return {sales:sales,total:total,sprinkles:sprinkles,spTotal:spTotal,mode:mode,budget:budget,attN:att.length,S1:S1,unit:unit,
+  return {sales:sales,total:total,sprinkles:sprinkles,spTotal:spTotal,bonusTotal:bonusTotal,mode:mode,budget:budget,attN:att.length,S1:S1,unit:unit,
     rows:rows,owe:owe,distributed:distributed,leftover:budget-distributed,
     sumNet:sum(rows,r=>r.net)+sum(owe,o=>o.amount),paidSum:sum(rows.filter(r=>r.paid),r=>r.net)+sum(owe.filter(o=>o.paid),o=>o.amount),
     pendingN:sales.filter(r=>r.pending).length};
@@ -172,7 +175,7 @@ const METHODS=['직접 거래','거래소'];
 const STATUS=['분배','제외','불참'];
 const PARTIES=['1파티','2파티','3파티','손님'];
 function uid(){ return 'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
-function mem(name,party,note,status){ return {name:name,party:party,note:note||'',status:status||'분배',rate:100,paid:false}; }
+function mem(name,party,note,status){ return {name:name,party:party,note:note||'',status:status||'분배',rate:100,bonus:0,paid:false}; }
 function seedWeek(){
   return {
     id:'seed-1121',label:'11월 21일 혼테일',
@@ -222,7 +225,7 @@ function save(){
   clearTimeout(saveT);
   saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){ storageOK=false; renderNotes(); } },250);
 }
-let VIEW={"id": "seed-1121", "label": "11월 21일 혼테일", "settings": {"fee": 5, "sprinklePrice": 500000, "sprinkleMode": "pool"}, "members": [{"name": "표웅식", "party": "1파티", "note": "알깨는사람", "status": "제외", "rate": 100, "paid": false}, {"name": "박하울", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "짜헛", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "토벤이국룰(효일)", "party": "1파티", "note": "닼나", "status": "분배", "rate": 100, "paid": false}, {"name": "고삼면", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "최쭌규", "party": "1파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "리스크감수", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "새싹대장님", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "z존표창z", "party": "2파티", "note": "", "status": "제외", "rate": 100, "paid": false}, {"name": "화살아껴쓰기", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "신구이", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "달이잠든바다", "party": "2파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "또추링", "party": "3파티", "note": "갠유", "status": "분배", "rate": 100, "paid": false}, {"name": "솜솜부인", "party": "3파티", "note": "와이번", "status": "분배", "rate": 100, "paid": false}, {"name": "뚝뿌기", "party": "3파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "인절떡", "party": "3파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "유지훔바", "party": "손님", "note": "알목 손님", "status": "제외", "rate": 100, "paid": false}], "sales": [{"item": "알목", "qty": 1, "unit": 30000000, "method": "직접 거래", "fee": 5, "buyer": "유지훔바", "note": ""}, {"item": "혼돈의 주문서 60%", "qty": 1, "unit": 16900000, "method": "거래소", "fee": 5, "buyer": "", "note": ""}, {"item": "메이플용사20", "qty": 1, "unit": 13399998, "method": "거래소", "fee": 5, "buyer": "", "note": ""}, {"item": "드래곤 그린 슬래브", "qty": 1, "unit": 6000000, "method": "거래소", "fee": 5, "buyer": "", "note": "공1하, 덱1하"}, {"item": "킹센트", "qty": 1, "unit": 440000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "3하"}, {"item": "크리븐", "qty": 1, "unit": 510000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "2하"}, {"item": "다크 네쉐르", "qty": 1, "unit": 450000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "정옵"}, {"item": "콘체르토 1상", "qty": 1, "unit": 1350000, "method": "거래소", "fee": 5, "buyer": "", "note": "1상"}], "sprinkles": [{"to": "유지훔바", "count": 1}, {"to": "표웅식", "count": 2}, {"to": "달이잠든바다", "count": 1}], "memo": "표웅식, z존표창z 분배 (흰경 분배 제외)"},VMETA={at:'11/21'},SHDB=null;
+let VIEW={"id": "seed-1121", "label": "11월 21일 혼테일", "settings": {"fee": 5, "sprinklePrice": 500000, "sprinkleMode": "pool"}, "members": [{"name": "표웅식", "party": "1파티", "note": "알깨는사람", "status": "제외", "rate": 100, "paid": false}, {"name": "박하울", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "짜헛", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "토벤이국룰(효일)", "party": "1파티", "note": "닼나", "status": "분배", "rate": 100, "paid": false}, {"name": "고삼면", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "최쭌규", "party": "1파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "리스크감수", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "새싹대장님", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "z존표창z", "party": "2파티", "note": "", "status": "제외", "rate": 100, "paid": false}, {"name": "화살아껴쓰기", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "신구이", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "달이잠든바다", "party": "2파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "또추링", "party": "3파티", "note": "갠유", "status": "분배", "rate": 100, "paid": false}, {"name": "솜솜부인", "party": "3파티", "note": "와이번", "status": "분배", "rate": 100, "paid": false}, {"name": "뚝뿌기", "party": "3파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "인절떡", "party": "3파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false, "bonus": 1000000}, {"name": "유지훔바", "party": "손님", "note": "알목 손님", "status": "제외", "rate": 100, "paid": false}], "sales": [{"item": "알목", "qty": 1, "unit": 30000000, "method": "직접 거래", "fee": 5, "buyer": "유지훔바", "note": ""}, {"item": "혼돈의 주문서 60%", "qty": 1, "unit": 16900000, "method": "거래소", "fee": 5, "buyer": "", "note": ""}, {"item": "메이플용사20", "qty": 1, "unit": 13399998, "method": "거래소", "fee": 5, "buyer": "", "note": ""}, {"item": "드래곤 그린 슬래브", "qty": 1, "unit": 6000000, "method": "거래소", "fee": 5, "buyer": "", "note": "공1하, 덱1하"}, {"item": "킹센트", "qty": 1, "unit": 440000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "3하"}, {"item": "크리븐", "qty": 1, "unit": 510000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "2하"}, {"item": "다크 네쉐르", "qty": 1, "unit": 450000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "정옵"}, {"item": "콘체르토 1상", "qty": 1, "unit": 1350000, "method": "거래소", "fee": 5, "buyer": "", "note": "1상"}], "sprinkles": [{"to": "유지훔바", "count": 1}, {"to": "표웅식", "count": 2}, {"to": "달이잠든바다", "count": 1}], "memo": "표웅식, z존표창z 분배 (흰경 분배 제외)"},VMETA={at:'11/21'},SHDB=null;
 function cur(){ return VIEW||S.weeks.find(w=>w.id===S.cur)||S.weeks[0]; }
 
 /* ---------- helpers ---------- */
@@ -264,7 +267,7 @@ function renderStrip(c){
   const T=(l,v,k)=>'<div class="tile'+(k?' key':'')+'"><span>'+l+'</span><b>'+v+'</b></div>';
   $('#tiles').innerHTML=
     T('총 판매 (수수료 후)',fmt(c.total))+
-    T('뿌리기 합계 (쓴 사람에게 지급)',fmt(c.spTotal))+
+    T('뿌리기 합계 (쓴 사람에게 지급)',fmt(c.spTotal))+(c.bonusTotal?T('추가 지급 합계',fmt(c.bonusTotal)):'')+
     T('분배 예산',fmt(c.budget),1)+
     T('분배 인원',c.attN+'명')+
     T('인당 분배금 (100%)',fmt(Math.floor(c.unit)),1);
@@ -286,11 +289,12 @@ function tabRoster(w){
     '<td>'+textIn('members.'+i+'.note',m.note,'style="min-width:120px"')+'</td>'+
     '<td>'+selIn('members.'+i+'.status',m.status,STATUS)+'</td>'+
     '<td>'+numIn('members.'+i+'.rate',m.rate,'sm')+'</td>'+
+    '<td>'+numIn('members.'+i+'.bonus',m.bonus||0)+'</td>'+
     '<td><button class="x" data-act="delMember" data-i="'+i+'" aria-label="삭제">✕</button></td></tr>').join('');
   return '<div class="panel"><h2>명단 · 파티 · 분배 상태</h2>'+
     '<p class="hint">상태가 「분배」인 사람만 분배표에 들어갑니다. 제외는 분배금을 받지 않는 사람(손님, 알깨기 담당 등), 불참은 오지 않은 사람입니다. 분배율을 낮추면 줄어든 몫이 다른 사람에게 나뉩니다.</p>'+
     '<div class="row" style="margin-bottom:10px"><button class="btn pri" data-act="addMember">+ 인원 추가</button><button class="btn" data-act="bulkMembers">여러 명 붙여넣기</button></div>'+
-    (w.members.length?'<div class="tw"><table><thead><tr><th class="c">No</th><th>닉네임</th><th>파티</th><th>메모</th><th>상태</th><th>분배율 %</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<p class="hint">아직 인원이 없습니다.</p>')+
+    (w.members.length?'<div class="tw"><table><thead><tr><th class="c">No</th><th>닉네임</th><th>파티</th><th>메모</th><th>상태</th><th>분배율 %</th><th class="r">추가 지급</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<p class="hint">아직 인원이 없습니다.</p>')+
     '</div>';
 }
 function tabSales(w,c){
@@ -328,8 +332,8 @@ function tabSpr(w,c){
 function buildCheck(c){
   const o=[];
   const add=(l,v,ok,d)=>o.push({l:l,v:v,ok:ok,d:d||''});
-  add('분배 예산 = 총 판매 − 뿌리기',fmt(c.budget),c.budget===c.total-c.spTotal,'');
-  add('총 지급액 = 분배금 합 + 뿌리기 합',fmt(c.sumNet),c.sumNet===c.distributed+c.spTotal,'차이 '+fmt(c.sumNet-c.distributed-c.spTotal));
+  add('분배 예산 = 총 판매 − 뿌리기 − 추가 지급',fmt(c.budget),c.budget===c.total-c.spTotal-c.bonusTotal,'');
+  add('총 지급액 = 분배금 합 + 뿌리기 + 추가 지급',fmt(c.sumNet),c.sumNet===c.distributed+c.spTotal+c.bonusTotal,'차이 '+fmt(c.sumNet-c.distributed-c.spTotal-c.bonusTotal));
   add('분배금 합 + 내림 잔액 = 분배 예산',fmt(c.distributed)+' + '+fmt(c.leftover),c.attN>0 && c.leftover>=0 && c.leftover<=Math.max(c.attN*2,1),'잔액 '+fmt(c.leftover));
   add('분배 인원 있음',c.attN+'명',c.attN>0 && c.S1>0,'명단 확인');
   return o;
@@ -338,12 +342,12 @@ function tabDist(w,c){
   const rows=c.rows.map(r=>'<tr><td class="c">'+r.no+'</td><td><b>'+esc(r.name)+'</b></td>'+
     '<td><span class="pill '+pillCls(r.party)+'">'+esc(r.party||'-')+'</span></td>'+
     '<td class="c'+(r.rate<100?' red':'')+'">'+r.rate+'%</td>'+
-    '<td class="r">'+fmt(r.share)+'</td><td class="r'+(r.spay?' good':'')+'">'+fmt(r.spay)+'</td>'+
+    '<td class="r">'+fmt(r.share)+'</td><td class="r'+(r.spay?' good':'')+'">'+fmt(r.spay)+'</td><td class="r'+(r.bonus?' good':'')+'">'+fmt(r.bonus)+'</td>'+
     '<td class="r"><b>'+fmt(r.net)+'</b></td>'+
     '<td class="c"><label class="tog"><input type="checkbox" data-f="members.'+r.mi+'.paid" data-rr="1"'+(r.paid?' checked':'')+' aria-label="지급완료"></label></td></tr>').join('');
   const oweRows=c.owe.map(o=>'<tr><td class="c">-</td><td><b>'+esc(o.name)+'</b></td>'+
     '<td><span class="pill '+pillCls(o.party)+'">'+esc(o.party||'-')+'</span></td>'+
-    '<td class="c">제외</td><td class="r">0</td><td class="r good">'+fmt(o.amount)+'</td>'+
+    '<td class="c">제외</td><td class="r">0</td><td class="r good">'+fmt(o.spay)+'</td><td class="r good">'+fmt(o.bonus)+'</td>'+
     '<td class="r"><b>'+fmt(o.amount)+'</b></td>'+
     '<td class="c">'+(o.mi>=0?'<label class="tog"><input type="checkbox" data-f="members.'+o.mi+'.paid" data-rr="1"'+(o.paid?' checked':'')+' aria-label="지급완료"></label>':'')+'</td></tr>').join('');
   const chk=buildCheck(c);
@@ -351,8 +355,8 @@ function tabDist(w,c){
   const absent=w.members.filter(m=>m.status==='불참').map(m=>m.name).filter(Boolean);
   return '<div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h2>분배표</h2><p class="hint" style="margin:0">제외: '+(esc(excluded.join(', '))||'없음')+' · 불참: '+(esc(absent.join(', '))||'없음')+'</p></div>'+
     '<div><span class="hint" style="margin:0">인당 분배금</span><div class="big">'+fmt(Math.floor(c.unit))+'</div></div></div>'+
-    (c.rows.length?'<div class="tw"><table><thead><tr><th class="c">순번</th><th>닉네임</th><th>파티</th><th class="c">분배율</th><th class="r">분배금</th><th class="r">뿌리기 지급</th><th class="r">받을 금액</th><th class="c">지급완료</th></tr></thead><tbody>'+rows+oweRows+'</tbody>'+
-    '<tfoot><tr><td></td><td>합계</td><td colspan="2"></td><td class="r">'+fmt(c.distributed)+'</td><td class="r">'+fmt(c.spTotal)+'</td><td class="r">'+fmt(c.sumNet)+'</td><td></td></tr></tfoot></table></div>':'<p class="hint">분배 대상이 없습니다. 명단 탭에서 상태를 「분배」로 바꾸세요.</p>')+
+    (c.rows.length?'<div class="tw"><table><thead><tr><th class="c">순번</th><th>닉네임</th><th>파티</th><th class="c">분배율</th><th class="r">분배금</th><th class="r">뿌리기 지급</th><th class="r">추가 지급</th><th class="r">받을 금액</th><th class="c">지급완료</th></tr></thead><tbody>'+rows+oweRows+'</tbody>'+
+    '<tfoot><tr><td></td><td>합계</td><td colspan="2"></td><td class="r">'+fmt(c.distributed)+'</td><td class="r">'+fmt(c.spTotal)+'</td><td class="r">'+fmt(c.bonusTotal)+'</td><td class="r">'+fmt(c.sumNet)+'</td><td></td></tr></tfoot></table></div>':'<p class="hint">분배 대상이 없습니다. 명단 탭에서 상태를 「분배」로 바꾸세요.</p>')+
     (c.owe.length?'<p class="hint" style="margin-top:10px">분배율이 「제외」인 줄은 분배 대상이 아니고 뿌리기 지급액만 받는 사람입니다.</p>':'')+
     '</div>'+
     '<div class="panel"><h2>검산</h2><div class="tw"><table><tbody>'+chk.map(k=>'<tr><td>'+k.l+'</td><td class="r">'+k.v+'</td><td class="c'+(k.ok?'':' red')+'">'+(k.ok?'✓':'✗ '+k.d)+'</td></tr>').join('')+'</tbody></table></div>'+
@@ -364,7 +368,7 @@ function buildParts(w,c){
   const e=dcEsc;
   const sec=[];
   sec.push(['**혼테일 정산** · '+e(w.label),
-    '총 판매(수수료 후) '+fmt(c.total)+' · 뿌리기 '+fmt(c.spTotal)+' (쓴 사람에게 지급, 분배 예산에서 차감)',
+    '총 판매(수수료 후) '+fmt(c.total)+' · 뿌리기 '+fmt(c.spTotal)+' (쓴 사람에게 지급, 분배 예산에서 차감)'+(c.bonusTotal?' · 추가 지급 '+fmt(c.bonusTotal):''),
     '분배 예산 '+fmt(c.budget)+' · 분배 '+c.attN+'명 · 인당 '+fmt(Math.floor(c.unit))]);
   const sold=c.sales.filter(r=>!r.pending);
   if(sold.length){
@@ -380,8 +384,8 @@ function buildParts(w,c){
     sec.push(L);
   }
   const D=['**분배**'];
-  c.rows.forEach(r=>D.push('• '+r.no+'번 '+e(r.name)+(r.rate<100?' ('+r.rate+'%)':'')+' · **'+fmt(r.net)+'**'+(r.spay?' (분배금 '+fmt(r.share)+' + 뿌리기 '+fmt(r.spay)+')':'')));
-  c.owe.forEach(o=>D.push('• '+e(o.name)+' (분배 제외) · 뿌리기 지급 **'+fmt(o.amount)+'**'));
+  c.rows.forEach(r=>D.push('• '+r.no+'번 '+e(r.name)+(r.rate<100?' ('+r.rate+'%)':'')+' · **'+fmt(r.net)+'**'+((r.spay||r.bonus)?' (분배금 '+fmt(r.share)+(r.spay?' + 뿌리기 '+fmt(r.spay):'')+(r.bonus?' + 추가 '+fmt(r.bonus):'')+')':'')));
+  c.owe.forEach(o=>D.push('• '+e(o.name)+' (분배 제외) · 지급 **'+fmt(o.amount)+'**'));
   const ex=w.members.filter(m=>m.status==='제외').map(m=>m.name).filter(Boolean);
   if(ex.length) D.push('분배 제외: '+e(ex.join(', ')));
   sec.push(D);
