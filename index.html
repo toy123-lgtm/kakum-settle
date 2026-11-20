@@ -359,8 +359,8 @@ function seedWeek1115(){
       {item:'3순위 투구',trt:'2',method:'직접 교환',qty:1,unit:25000000,holder:'',note:'TheEnd (수비표창수저 지인), 11월 8일 분배금에서 선차감'}
     ],
     expenses:[
-      {type:'실비',name:'알버프 구입 (판매자 버섴뀽)',to:'',amount:4000000,base:0,note:'미지급, 3순위 투구 획득 시 대금에서 차감'},
-      {type:'실비',name:'영메 구입 (판매자 포도알2개)',to:'표웅식',amount:0,base:0,note:'환급액 미정'},
+      {type:'실비',name:'알버프 구입 (판매자 버섴뀽)',to:'',amount:4000000,base:0,note:'3순위 투구 구매자가 2,500만에서 차감하고 2,100만 지불'},
+      {type:'실비',name:'영메 구입 (판매자 포도알2개)',to:'표웅식',amount:1500000,base:0,note:'표웅식 환급 150만'},
       {type:'구인',name:'구인 인센 (홋비)',to:'좌우중간',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
       {type:'구인',name:'구인 인센 (축축한양말)',to:'토벤이국룰',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
       {type:'구인',name:'구인 인센 (평택안마방)',to:'토벤이국룰',amount:0,base:60000000,note:'확정 투구 판매액의 1%'},
@@ -490,6 +490,13 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       S.seedsDone.push('bp-1115'); changed=true;
       seedWeek1115().expenses.filter(e=>e.type==='뿌리기').forEach(e=>{
         if(!w2.expenses.some(x=>x.name===e.name)) w2.expenses.push(e);
+      });
+    }
+    if(!S.seedsDone.includes('ym-1115')){
+      S.seedsDone.push('ym-1115'); changed=true;
+      w2.expenses.forEach(e=>{
+        if(/^영메 구입/.test(e.name||'') && !num(e.amount)){ e.amount=1500000; e.note='표웅식 환급 150만'; }
+        if(/^알버프 구입/.test(e.name||'') && e.note==='미지급, 3순위 투구 획득 시 대금에서 차감'){ e.note='3순위 투구 구매자가 2,500만에서 차감하고 2,100만 지불'; }
       });
     }
     if(!S.seedsDone.includes('mb-1115')){
