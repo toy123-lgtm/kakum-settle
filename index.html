@@ -346,6 +346,7 @@ function seedWeek1115(){
       {item:'투구 지력 주문서 10%',trt:'2',method:'거래소',qty:1,unit:740000,holder:'',note:''},
       {item:'혼돈의 주문서',trt:'1',method:'거래소',qty:1,unit:15999999,holder:'',note:'60%'},
       {item:'혼돈의 주문서',trt:'2',method:'거래소',qty:1,unit:15999999,holder:'',note:'60%'},
+      {item:'[마북] 메이플 용사 30',trt:'2',method:'거래소',qty:1,unit:614999998,holder:'',note:''},
       {item:'순록의 우유',trt:'1',method:'거래소',qty:68,unit:5298,holder:'',note:''},
       {item:'엘릭서',trt:'1',method:'거래소',qty:49,unit:7310,holder:'',note:''},
       {item:'파워 엘릭서',trt:'1',method:'거래소',qty:36,unit:14150,holder:'',note:''},
@@ -490,6 +491,10 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       seedWeek1115().expenses.filter(e=>e.type==='뿌리기').forEach(e=>{
         if(!w2.expenses.some(x=>x.name===e.name)) w2.expenses.push(e);
       });
+    }
+    if(!S.seedsDone.includes('mb-1115')){
+      S.seedsDone.push('mb-1115'); changed=true;
+      if(!w2.sales.some(x=>x.item==='[마북] 메이플 용사 30' && String(x.trt)==='2')) w2.sales.push({item:'[마북] 메이플 용사 30',trt:'2',method:'거래소',qty:1,unit:614999998,holder:'',note:''});
     }
     if(!S.seedsDone.includes('ch-1115')){
       S.seedsDone.push('ch-1115'); changed=true;
