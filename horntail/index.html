@@ -432,6 +432,7 @@ function render(){
     document.body.classList.add('view');
     const w=VIEW, c=calc(w); LAST=c; renderStrip(c);
     $('#view').innerHTML='<div class="vbar">읽기 전용 · 정산 담당자가 공유한 내용입니다'+(VMETA&&VMETA.at?' · 갱신 '+esc(VMETA.at):'')+'</div>'+tabDist(w,c)+viewSales(w,c);
+    $$('#view input,#view select,#view textarea').forEach(el=>{ el.disabled=true; });
     return;
   }
   document.body.classList.remove('view');
