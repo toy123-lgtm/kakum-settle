@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>혼테일 정산 결과 (11월 21일)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f1ee; --surface:#ffffff; --ink:#2a1f1c; --muted:#6e605b; --line:#e0d8d2;
+  --accent:#b23a1e; --accent-ink:#ffffff; --cell:#fff4c2; --warn:#9a5a0c; --bad:#b0332a; --good:#2a7842;
+  --font-body:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-display:"Black Han Sans","IBM Plex Sans KR","Noto Sans KR",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#181211; --surface:#221a18; --ink:#f0e6e2; --muted:#a8958e; --line:#3a2e2a;
+    --accent:#ff8a65; --accent-ink:#1d0f0a; --cell:#3a3418; --warn:#e0a24d; --bad:#ef7d72; --good:#6cc487;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+h1{font-family:var(--font-display);font-weight:400;font-size:26px;margin:0;text-wrap:balance}
+h1 small{font-family:var(--font-body);font-size:13px;color:var(--muted);margin-left:8px;font-weight:500}
+.weekbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;cursor:pointer;min-height:36px}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.danger{color:var(--bad)}
+.btn.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:8px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tile span{display:block;font-size:12px;color:var(--muted)}
+.tile b{display:block;font-size:19px;font-weight:700;margin-top:2px;word-break:keep-all}
+.tile.key{border-color:var(--accent)}
+.notes{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.note{font-size:13px;color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent);border-radius:8px;padding:6px 10px}
+.note.info{color:var(--muted);background:color-mix(in srgb,var(--muted) 10%,transparent)}
+nav.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;margin-bottom:14px}
+nav.tabs button{border:0;background:transparent;padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;color:var(--muted);font-weight:500}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:700}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel + .panel{margin-top:12px}
+h2{font-size:16px;margin:0 0 4px}
+p.hint{margin:0 0 10px;color:var(--muted);font-size:13px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:600px}
+th,td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right}
+td.c,th.c{text-align:center}
+tr.off td{opacity:.5}
+tfoot td{font-weight:700;border-bottom:0}
+.in{width:100%;background:var(--cell);border:1px solid transparent;border-radius:6px;padding:5px 7px;min-height:32px}
+.in:focus{border-color:var(--accent);outline:none}
+.in.num{text-align:right;min-width:90px}
+.in.sm{min-width:64px;width:76px}
+.in.sel{min-width:90px;width:auto;cursor:pointer}
+td.nt{width:99%}td.nt .in{min-width:160px}
+td button.x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 8px}
+td button.x:hover{color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.fld .in{color:var(--ink);font-size:15px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+textarea.in{min-height:140px;font-family:inherit;width:100%}
+.red{color:var(--bad);font-weight:600}
+.good{color:var(--good);font-weight:600}
+.tog{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--accent)}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:var(--muted)}
+.pill.p1{background:#c2410c}.pill.p2{background:#1c6a65}.pill.p3{background:#6d4fc2}.pill.pg{background:#2b6cb0}
+tr.pend td.nm{color:var(--warn)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;z-index:50;max-width:90vw}
+.toast[hidden]{display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60}
+.modal[hidden]{display:none}
+.modal .box{background:var(--surface);border-radius:12px;padding:16px;width:min(560px,100%);max-height:90vh;overflow:auto}
+.big{font-size:22px;font-weight:800}
+.vbar{background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid var(--accent);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px}
+body.chk .wrap{visibility:hidden}
+body.view .weekbar,body.view #tabs{display:none}
+body.view input,body.view select{pointer-events:none}
+@media (max-width:520px){ .wrap{padding:12px} h1{font-size:22px} .tile b{font-size:16px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>혼테일 정산기<small>에필로그 길드 혼테일 레이드 정산</small></h1>
+    <div class="weekbar">
+      <select id="weekSel" class="in" style="width:auto;background:var(--surface);border:1px solid var(--line)" aria-label="회차 선택"></select>
+      <button class="btn pri" id="shareBtn" data-act="shareSnap" hidden>공유 갱신</button>
+      <button class="btn pri" data-act="newWeek">새 회차</button>
+      <button class="btn danger" data-act="delWeek" data-arm="1">회차 삭제</button>
+    </div>
+  </header>
+  <section id="tiles" class="tiles" aria-live="polite"></section>
+  <section id="notes" class="notes"></section>
+  <nav id="tabs" class="tabs" role="tablist"></nav>
+  <main id="view"></main>
+</div>
+<div id="toast" class="toast" hidden></div>
+<div id="modal" class="modal" hidden><div class="box" id="modalBox"></div></div>
+
+<script>
+(function(){
+'use strict';
+
+// CALC-START
+function num(v){
+  if(typeof v==='number') return isFinite(v)?v:0;
+  const n=Number(String(v==null?'':v).replace(/[,\s원]/g,''));
+  return isFinite(n)?n:0;
+}
+function fmt(n){ return Math.round(num(n)).toLocaleString('en-US'); }
+function sum(a,f){ let t=0; for(const x of a) t+=f(x); return t; }
+function pct(v){ return Math.max(0,num(v))/100; }
+function hasVal(v){ return v!==undefined && v!==null && String(v).trim()!==''; }
+function calc(w){
+  const s=w.settings;
+  const sales=w.sales.map(r=>{
+    const gross=Math.round(num(r.qty)*num(r.unit));
+    const fx=hasVal(r.fee)?num(r.fee):(r.method==='거래소'?num(s.fee):0);
+    const net=Math.floor((gross*(10000-Math.round(fx*100))+5000)/10000);
+    return Object.assign({},r,{gross:gross,net:net,pending:num(r.unit)<=0});
+  });
+  const total=sum(sales,r=>r.net);
+  const sprinkles=w.sprinkles.map(p=>Object.assign({},p,{amount:Math.round(num(p.count)*num(s.sprinklePrice))}));
+  const spTotal=sum(sprinkles,p=>p.amount);
+  const mode='pool';
+  const budget=total-spTotal;
+  const att=w.members.filter(m=>m.status==='분배' && String(m.name||'').trim());
+  const S1=sum(att,m=>pct(m.rate));
+  const unit=S1>0?budget/S1:0;
+  const spBy={};
+  sprinkles.forEach(p=>{ const n=String(p.to||'').trim(); if(n) spBy[n]=(spBy[n]||0)+p.amount; });
+  const rows=att.map((m,i)=>{
+    const name=String(m.name).trim();
+    const share=Math.floor(unit*pct(m.rate)+1e-6);
+    const spay=spBy[name]||0;
+    return {no:i+1,mi:w.members.indexOf(m),name:name,party:m.party||'',rate:num(m.rate),share:share,spay:spay,net:share+spay,paid:!!m.paid};
+  });
+  const inDist=new Set(rows.map(r=>r.name));
+  const owe=[];
+  Object.keys(spBy).forEach(n=>{
+    if(inDist.has(n)) return;
+    const mm=w.members.find(m=>String(m.name||'').trim()===n);
+    owe.push({name:n,amount:spBy[n],mi:mm?w.members.indexOf(mm):-1,party:mm?(mm.party||''):'',paid:!!(mm&&mm.paid)});
+  });
+  const distributed=sum(rows,r=>r.share);
+  return {sales:sales,total:total,sprinkles:sprinkles,spTotal:spTotal,mode:mode,budget:budget,attN:att.length,S1:S1,unit:unit,
+    rows:rows,owe:owe,distributed:distributed,leftover:budget-distributed,
+    sumNet:sum(rows,r=>r.net)+sum(owe,o=>o.amount),paidSum:sum(rows.filter(r=>r.paid),r=>r.net)+sum(owe.filter(o=>o.paid),o=>o.amount),
+    pendingN:sales.filter(r=>r.pending).length};
+}
+// CALC-END
+
+/* ---------- state ---------- */
+const KEY='ht-settle-v1';
+let storageOK=true;
+const METHODS=['직접 거래','거래소'];
+const STATUS=['분배','제외','불참'];
+const PARTIES=['1파티','2파티','3파티','손님'];
+function uid(){ return 'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function mem(name,party,note,status){ return {name:name,party:party,note:note||'',status:status||'분배',rate:100,paid:false}; }
+function seedWeek(){
+  return {
+    id:'seed-1121',label:'11월 21일 혼테일',
+    settings:{fee:5,sprinklePrice:500000,sprinkleMode:'pool'},
+    members:[
+      mem('표웅식','1파티','알깨는사람','제외'),mem('박하울','1파티'),mem('짜헌','1파티'),mem('토벤이국룰','1파티','달나'),mem('고삼면','1파티'),mem('최쭌규','1파티','파티장'),
+      mem('리스크감수','2파티'),mem('새싹대장님','2파티'),mem('z존표창z','2파티','','제외'),mem('화살아껴쓰끼','2파티'),mem('신구이','2파티'),mem('달이잠든바다','2파티','파티장'),
+      mem('또추링','3파티','갠유'),mem('솜솜부인','3파티','와이번'),mem('뚝뽀기','3파티'),mem('인절떡','3파티','파티장'),
+      mem('유지훔바','손님','알목 손님','제외')
+    ],
+    sales:[
+      {item:'알목',qty:1,unit:30000000,method:'직접 거래',fee:'',buyer:'유지훔바',note:''},
+      {item:'혼돈의 주문서 60%',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''},
+      {item:'메이플용사20',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''},
+      {item:'드그슬 1하',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''},
+      {item:'킹센트 3하',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''},
+      {item:'크리븐 2하',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''},
+      {item:'다크 네쉐르 정옵',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''},
+      {item:'콘체르토 1상',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''}
+    ],
+    sprinkles:[{to:'유지훔바',count:1},{to:'표웅식',count:2},{to:'달이잠든바다',count:1}],
+    memo:'밍딩동 불참\n표웅식, z존표창z 분배 제외'
+  };
+}
+function blankWeek(label,from){
+  const w={id:uid(),label:label,settings:from?JSON.parse(JSON.stringify(from.settings)):{fee:5,sprinklePrice:500000,sprinkleMode:'pool'},
+    members:[],sales:[],sprinkles:[],memo:''};
+  if(from) w.members=from.members.map(m=>Object.assign({},m,{paid:false}));
+  return w;
+}
+function validState(s){
+  return s && Array.isArray(s.weeks) && s.weeks.length>0 &&
+    s.weeks.every(w=>w && w.settings && Array.isArray(w.members) && Array.isArray(w.sales) && Array.isArray(w.sprinkles));
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY); if(!raw) return null;
+    const s=JSON.parse(raw); return validState(s)?s:null;
+  }catch(e){ storageOK=false; return null; }
+}
+let S=load();
+if(!S){ const w=seedWeek(); S={v:1,cur:w.id,weeks:[w]}; }
+if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
+let saveT=null;
+function save(){
+  if(VIEW) return;
+  clearTimeout(saveT);
+  saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){ storageOK=false; renderNotes(); } },250);
+}
+let VIEW={"id": "seed-1121", "label": "11월 21일 혼테일", "settings": {"fee": 5, "sprinklePrice": 500000, "sprinkleMode": "pool"}, "members": [{"name": "표웅식", "party": "1파티", "note": "알깨는사람", "status": "제외", "rate": 100, "paid": false}, {"name": "박하울", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "짜헛", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "토벤이국룰(효일)", "party": "1파티", "note": "닼나", "status": "분배", "rate": 100, "paid": false}, {"name": "고삼면", "party": "1파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "최쭌규", "party": "1파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "리스크감수", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "새싹대장님", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "z존표창z", "party": "2파티", "note": "", "status": "제외", "rate": 100, "paid": false}, {"name": "화살아껴쓰기", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "신구이", "party": "2파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "달이잠든바다", "party": "2파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "또추링", "party": "3파티", "note": "갠유", "status": "분배", "rate": 100, "paid": false}, {"name": "솜솜부인", "party": "3파티", "note": "와이번", "status": "분배", "rate": 100, "paid": false}, {"name": "뚝뿌기", "party": "3파티", "note": "", "status": "분배", "rate": 100, "paid": false}, {"name": "인절떡", "party": "3파티", "note": "파티장", "status": "분배", "rate": 100, "paid": false}, {"name": "유지훔바", "party": "손님", "note": "알목 손님", "status": "제외", "rate": 100, "paid": false}], "sales": [{"item": "알목", "qty": 1, "unit": 30000000, "method": "직접 거래", "fee": 5, "buyer": "유지훔바", "note": ""}, {"item": "혼돈의 주문서 60%", "qty": 1, "unit": 16900000, "method": "거래소", "fee": 5, "buyer": "", "note": ""}, {"item": "메이플용사20", "qty": 1, "unit": 13399998, "method": "거래소", "fee": 5, "buyer": "", "note": ""}, {"item": "드래곤 그린 슬래브", "qty": 1, "unit": 6000000, "method": "거래소", "fee": 5, "buyer": "", "note": "공1하, 덱1하"}, {"item": "킹센트", "qty": 1, "unit": 440000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "3하"}, {"item": "크리븐", "qty": 1, "unit": 510000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "2하"}, {"item": "다크 네쉐르", "qty": 1, "unit": 450000, "method": "거래소", "fee": 0, "buyer": "상점 판매", "note": "정옵"}, {"item": "콘체르토 1상", "qty": 1, "unit": 1350000, "method": "거래소", "fee": 5, "buyer": "", "note": "1상"}], "sprinkles": [{"to": "유지훔바", "count": 1}, {"to": "표웅식", "count": 2}, {"to": "달이잠든바다", "count": 1}], "memo": "표웅식, z존표창z 분배 (흰경 분배 제외)"},VMETA={at:'11/21'},SHDB=null;
+function cur(){ return VIEW||S.weeks.find(w=>w.id===S.cur)||S.weeks[0]; }
+
+/* ---------- helpers ---------- */
+const $=(sel,el)=>(el||document).querySelector(sel);
+const $$=(sel,el)=>Array.from((el||document).querySelectorAll(sel));
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtIn(n){ return Number.isInteger(n)?n.toLocaleString('en-US'):String(n); }
+function setPath(o,path,val){ const k=path.split('.'); let t=o; for(let i=0;i<k.length-1;i++) t=t[k[i]]; t[k[k.length-1]]=val; }
+let toastT=null;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{t.hidden=true;},2400); }
+function openModal(html){ $('#modalBox').innerHTML=html; $('#modal').hidden=false; }
+function closeModal(){ $('#modal').hidden=true; }
+function copyText(text,okMsg){
+  const fallback=()=>{
+    openModal('<h2>직접 복사하세요</h2><p class="hint">자동 복사가 막혀 있습니다. 아래 내용을 전체 선택해 복사하세요.</p><textarea class="in" id="fbTa" readonly>'+esc(text)+'</textarea><div class="row" style="margin-top:10px"><button class="btn" data-act="closeModal">닫기</button></div>');
+    const ta=$('#fbTa'); if(ta){ ta.focus(); ta.select(); }
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(()=>toast(okMsg||'복사했습니다.'),fallback);
+    else fallback();
+  }catch(e){ fallback(); }
+}
+function numIn(path,val,cls){ return '<input class="in num '+(cls||'')+'" inputmode="numeric" data-t="num" data-f="'+path+'" value="'+esc(fmtIn(num(val)))+'">'; }
+function textIn(path,val,extra){ return '<input class="in" data-f="'+path+'" value="'+esc(val)+'" '+(extra||'')+'>'; }
+function selIn(path,val,opts,cls){ return '<select class="in sel '+(cls||'')+'" data-rr="1" data-f="'+path+'">'+opts.map(o=>'<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>'; }
+function pillCls(p){ return p==='1파티'?'p1':p==='2파티'?'p2':p==='3파티'?'p3':'pg'; }
+
+/* ---------- render ---------- */
+let TAB='roster', LAST=null;
+const TABS=[['roster','명단'],['sales','드랍·판매'],['spr','뿌리기'],['dist','분배표'],['text','결과 복사'],['set','설정']];
+function renderHead(){
+  const sel=$('#weekSel');
+  sel.innerHTML=S.weeks.map(w=>'<option value="'+esc(w.id)+'"'+(w.id===S.cur?' selected':'')+'>'+esc(w.label)+'</option>').join('');
+  $('#tabs').innerHTML=TABS.map(t=>'<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(TAB===t[0])+'">'+t[1]+'</button>').join('');
+  renderStrip();
+}
+function renderStrip(c){
+  const w=cur(); c=c||calc(w); LAST=c;
+  const T=(l,v,k)=>'<div class="tile'+(k?' key':'')+'"><span>'+l+'</span><b>'+v+'</b></div>';
+  $('#tiles').innerHTML=
+    T('총 판매 (수수료 후)',fmt(c.total))+
+    T('뿌리기 합계 (쓴 사람에게 지급)',fmt(c.spTotal))+
+    T('분배 예산',fmt(c.budget),1)+
+    T('분배 인원',c.attN+'명')+
+    T('인당 분배금 (100%)',fmt(Math.floor(c.unit)),1);
+  renderNotes();
+}
+function renderNotes(){
+  const w=cur(), c=LAST||calc(w), out=[];
+  if(!storageOK) out.push(['','이 브라우저에서 자동 저장이 막혀 있습니다. 설정 탭에서 백업을 자주 복사해 두세요.']);
+  if(c.total>0 && c.S1<=0) out.push(['','판매액이 있지만 분배 대상이 없습니다. 명단 탭에서 상태를 확인하세요.']);
+  if(c.pendingN>0) out.push(['info','가격이 비어 있는 드랍템 '+c.pendingN+'개는 아직 정산에 들어가지 않았습니다.']);
+  if(c.attN>0 && c.leftover>0 && c.leftover<1000) out.push(['info','단수 차이 '+fmt(c.leftover)+' 메소는 내림 처리로 남습니다.']);
+  $('#notes').innerHTML=out.map(n=>'<div class="note '+n[0]+'">'+esc(n[1])+'</div>').join('');
+}
+function tabRoster(w){
+  const rows=w.members.map((m,i)=>'<tr class="'+(m.status==='분배'?'':'off')+'">'+
+    '<td class="c">'+(i+1)+'</td>'+
+    '<td>'+textIn('members.'+i+'.name',m.name,'style="min-width:120px"')+'</td>'+
+    '<td>'+selIn('members.'+i+'.party',m.party,PARTIES)+'</td>'+
+    '<td>'+textIn('members.'+i+'.note',m.note,'style="min-width:120px"')+'</td>'+
+    '<td>'+selIn('members.'+i+'.status',m.status,STATUS)+'</td>'+
+    '<td>'+numIn('members.'+i+'.rate',m.rate,'sm')+'</td>'+
+    '<td><button class="x" data-act="delMember" data-i="'+i+'" aria-label="삭제">✕</button></td></tr>').join('');
+  return '<div class="panel"><h2>명단 · 파티 · 분배 상태</h2>'+
+    '<p class="hint">상태가 「분배」인 사람만 분배표에 들어갑니다. 제외는 분배금을 받지 않는 사람(손님, 알깨기 담당 등), 불참은 오지 않은 사람입니다. 분배율을 낮추면 줄어든 몫이 다른 사람에게 나뉩니다.</p>'+
+    '<div class="row" style="margin-bottom:10px"><button class="btn pri" data-act="addMember">+ 인원 추가</button><button class="btn" data-act="bulkMembers">여러 명 붙여넣기</button></div>'+
+    (w.members.length?'<div class="tw"><table><thead><tr><th class="c">No</th><th>닉네임</th><th>파티</th><th>메모</th><th>상태</th><th>분배율 %</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<p class="hint">아직 인원이 없습니다.</p>')+
+    '</div>';
+}
+function tabSales(w,c){
+  const rows=w.sales.map((r,i)=>'<tr class="'+(c.sales[i].pending?'pend':'')+'">'+
+    '<td class="c">'+(i+1)+'</td>'+
+    '<td class="nm">'+textIn('sales.'+i+'.item',r.item,'style="min-width:170px"')+'</td>'+
+    '<td>'+numIn('sales.'+i+'.qty',r.qty,'sm')+'</td>'+
+    '<td>'+numIn('sales.'+i+'.unit',r.unit,'')+'</td>'+
+    '<td>'+selIn('sales.'+i+'.method',r.method,METHODS)+'</td>'+
+    '<td><input class="in num sm" inputmode="decimal" data-t="feeov" data-f="sales.'+i+'.fee" placeholder="기본" value="'+esc(hasVal(r.fee)?r.fee:'')+'"></td>'+
+    '<td>'+textIn('sales.'+i+'.buyer',r.buyer,'style="min-width:100px"')+'</td>'+
+    '<td class="r" data-net="'+i+'"><b>'+fmt(c.sales[i].net)+'</b></td>'+
+    '<td class="nt">'+textIn('sales.'+i+'.note',r.note,'')+'</td>'+
+    '<td><button class="x" data-act="delSale" data-i="'+i+'" aria-label="삭제">✕</button></td></tr>').join('');
+  return '<div class="panel"><h2>드랍템 · 판매 내역</h2>'+
+    '<p class="hint">단가가 0이면 아직 팔지 않은 것으로 보고 정산에서 뺍니다. 직접 거래는 수수료 0%, 거래소는 설정의 수수료율을 씁니다. 행마다 수수료%를 따로 적을 수도 있습니다.</p>'+
+    '<div class="row" style="margin-bottom:10px"><button class="btn pri" data-act="addSale">+ 드랍템 추가</button></div>'+
+    (w.sales.length?'<div class="tw"><table><thead><tr><th class="c">No</th><th>물품</th><th>수량</th><th class="r">단가</th><th>방식</th><th>수수료%</th><th>구매자</th><th class="r">수령액</th><th>비고</th><th></th></tr></thead><tbody>'+rows+'</tbody>'+
+    '<tfoot><tr><td></td><td>합계</td><td colspan="6"></td><td class="r" data-sum="net">'+fmt(c.total)+'</td><td colspan="2"></td></tr></tfoot></table></div>':'<p class="hint">아직 드랍템이 없습니다.</p>')+
+    '</div>'+
+    '<div class="panel"><h2>회차 메모</h2><textarea class="in" data-f="memo">'+esc(w.memo||'')+'</textarea></div>';
+}
+function tabSpr(w,c){
+  const rows=w.sprinkles.map((p,i)=>'<tr><td>'+textIn('sprinkles.'+i+'.to',p.to,'style="min-width:130px"')+'</td>'+
+    '<td>'+numIn('sprinkles.'+i+'.count',p.count,'sm')+'</td>'+
+    '<td class="r" data-spamt="'+i+'"><b>'+fmt(c.sprinkles[i].amount)+'</b></td>'+
+    '<td><button class="x" data-act="delSpr" data-i="'+i+'" aria-label="삭제">✕</button></td></tr>').join('');
+  return '<div class="panel"><h2>뿌리기</h2><div class="grid2" style="margin-bottom:12px">'+
+    '<div class="fld">개당 가격 (메소)'+numIn('settings.sprinklePrice',w.settings.sprinklePrice)+'</div>'+
+    '</div><p class="hint">뿌리기를 쓴 사람에게 개당 가격만큼 지급합니다. 이 금액은 분배 예산에서 먼저 빼고, 남은 금액을 분배 인원이 나눕니다. 분배 대상이 아닌 사람(손님, 제외 인원)도 분배표 맨 아래에 줄로 나옵니다.</p>'+
+    '<div class="row" style="margin-bottom:10px"><button class="btn pri" data-act="addSpr">+ 받는 사람 추가</button></div>'+
+    (w.sprinkles.length?'<div class="tw"><table><thead><tr><th>받는 사람</th><th>개수</th><th class="r">금액</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td>합계</td><td data-sum="spcount">'+fmt(sum(w.sprinkles,p=>num(p.count)))+'개</td><td class="r" data-sum="sp">'+fmt(c.spTotal)+'</td><td></td></tr></tfoot></table></div>':'<p class="hint">뿌리기 내역이 없습니다.</p>')+
+    '</div>';
+}
+function buildCheck(c){
+  const o=[];
+  const add=(l,v,ok,d)=>o.push({l:l,v:v,ok:ok,d:d||''});
+  add('분배 예산 = 총 판매 − 뿌리기',fmt(c.budget),c.budget===c.total-c.spTotal,'');
+  add('총 지급액 = 분배금 합 + 뿌리기 합',fmt(c.sumNet),c.sumNet===c.distributed+c.spTotal,'차이 '+fmt(c.sumNet-c.distributed-c.spTotal));
+  add('분배금 합 + 내림 잔액 = 분배 예산',fmt(c.distributed)+' + '+fmt(c.leftover),c.attN>0 && c.leftover>=0 && c.leftover<=Math.max(c.attN*2,1),'잔액 '+fmt(c.leftover));
+  add('분배 인원 있음',c.attN+'명',c.attN>0 && c.S1>0,'명단 확인');
+  return o;
+}
+function tabDist(w,c){
+  const rows=c.rows.map(r=>'<tr><td class="c">'+r.no+'</td><td><b>'+esc(r.name)+'</b></td>'+
+    '<td><span class="pill '+pillCls(r.party)+'">'+esc(r.party||'-')+'</span></td>'+
+    '<td class="c'+(r.rate<100?' red':'')+'">'+r.rate+'%</td>'+
+    '<td class="r">'+fmt(r.share)+'</td><td class="r'+(r.spay?' good':'')+'">'+fmt(r.spay)+'</td>'+
+    '<td class="r"><b>'+fmt(r.net)+'</b></td>'+
+    '<td class="c"><label class="tog"><input type="checkbox" data-f="members.'+r.mi+'.paid" data-rr="1"'+(r.paid?' checked':'')+' aria-label="지급완료"></label></td></tr>').join('');
+  const oweRows=c.owe.map(o=>'<tr><td class="c">-</td><td><b>'+esc(o.name)+'</b></td>'+
+    '<td><span class="pill '+pillCls(o.party)+'">'+esc(o.party||'-')+'</span></td>'+
+    '<td class="c">제외</td><td class="r">0</td><td class="r good">'+fmt(o.amount)+'</td>'+
+    '<td class="r"><b>'+fmt(o.amount)+'</b></td>'+
+    '<td class="c">'+(o.mi>=0?'<label class="tog"><input type="checkbox" data-f="members.'+o.mi+'.paid" data-rr="1"'+(o.paid?' checked':'')+' aria-label="지급완료"></label>':'')+'</td></tr>').join('');
+  const chk=buildCheck(c);
+  const excluded=w.members.filter(m=>m.status==='제외').map(m=>m.name).filter(Boolean);
+  const absent=w.members.filter(m=>m.status==='불참').map(m=>m.name).filter(Boolean);
+  return '<div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:6px"><div><h2>분배표</h2><p class="hint" style="margin:0">제외: '+(esc(excluded.join(', '))||'없음')+' · 불참: '+(esc(absent.join(', '))||'없음')+'</p></div>'+
+    '<div><span class="hint" style="margin:0">인당 분배금</span><div class="big">'+fmt(Math.floor(c.unit))+'</div></div></div>'+
+    (c.rows.length?'<div class="tw"><table><thead><tr><th class="c">순번</th><th>닉네임</th><th>파티</th><th class="c">분배율</th><th class="r">분배금</th><th class="r">뿌리기 지급</th><th class="r">받을 금액</th><th class="c">지급완료</th></tr></thead><tbody>'+rows+oweRows+'</tbody>'+
+    '<tfoot><tr><td></td><td>합계</td><td colspan="2"></td><td class="r">'+fmt(c.distributed)+'</td><td class="r">'+fmt(c.spTotal)+'</td><td class="r">'+fmt(c.sumNet)+'</td><td></td></tr></tfoot></table></div>':'<p class="hint">분배 대상이 없습니다. 명단 탭에서 상태를 「분배」로 바꾸세요.</p>')+
+    (c.owe.length?'<p class="hint" style="margin-top:10px">분배율이 「제외」인 줄은 분배 대상이 아니고 뿌리기 지급액만 받는 사람입니다.</p>':'')+
+    '</div>'+
+    '<div class="panel"><h2>검산</h2><div class="tw"><table><tbody>'+chk.map(k=>'<tr><td>'+k.l+'</td><td class="r">'+k.v+'</td><td class="c'+(k.ok?'':' red')+'">'+(k.ok?'✓':'✗ '+k.d)+'</td></tr>').join('')+'</tbody></table></div>'+
+    '<p class="hint" style="margin:10px 0 0">지급 대상 '+fmt(c.sumNet)+' · 지급완료 '+fmt(c.paidSum)+' · 남은 금액 <b>'+fmt(c.sumNet-c.paidSum)+'</b></p></div>';
+}
+const DC_LIMIT=1900;
+function dcEsc(v){ return String(v==null?'':v).replace(/([\\*_~`|>#<])/g,'\\$1').replace(/@/g,'@\u200b'); }
+function buildParts(w,c){
+  const e=dcEsc;
+  const sec=[];
+  sec.push(['**혼테일 정산** · '+e(w.label),
+    '총 판매(수수료 후) '+fmt(c.total)+' · 뿌리기 '+fmt(c.spTotal)+' (쓴 사람에게 지급, 분배 예산에서 차감)',
+    '분배 예산 '+fmt(c.budget)+' · 분배 '+c.attN+'명 · 인당 '+fmt(Math.floor(c.unit))]);
+  const sold=c.sales.filter(r=>!r.pending);
+  if(sold.length){
+    const L=['**판매 내역**'];
+    sold.forEach(r=>L.push('• '+e(r.item)+(r.qty!==1&&num(r.qty)!==1?' ×'+fmt(r.qty):'')+(r.buyer?' → '+e(r.buyer):'')+' | '+fmt(r.net)));
+    sec.push(L);
+  }
+  const wait=c.sales.filter(r=>r.pending);
+  if(wait.length) sec.push(['**미판매 드랍템**',wait.map(r=>e(r.item)).join(', ')]);
+  if(c.sprinkles.length){
+    const L=['**뿌리기** (개당 '+fmt(w.settings.sprinklePrice)+')'];
+    c.sprinkles.forEach(p=>L.push('• '+e(p.to)+' '+fmt(p.count)+'개 | '+fmt(p.amount)));
+    sec.push(L);
+  }
+  const D=['**분배**'];
+  c.rows.forEach(r=>D.push('• '+r.no+'번 '+e(r.name)+(r.rate<100?' ('+r.rate+'%)':'')+' · **'+fmt(r.net)+'**'+(r.spay?' (분배금 '+fmt(r.share)+' + 뿌리기 '+fmt(r.spay)+')':'')));
+  c.owe.forEach(o=>D.push('• '+e(o.name)+' (분배 제외) · 뿌리기 지급 **'+fmt(o.amount)+'**'));
+  const ex=w.members.filter(m=>m.status==='제외').map(m=>m.name).filter(Boolean);
+  if(ex.length) D.push('분배 제외: '+e(ex.join(', ')));
+  sec.push(D);
+  const parts=[]; let cu=[];
+  const len=a=>a.join('\n\n').length;
+  sec.forEach(block=>{
+    const txt=block.join('\n');
+    if(cu.length && len(cu)+2+txt.length>DC_LIMIT){ parts.push(cu.join('\n\n')); cu=[]; }
+    if(txt.length>DC_LIMIT){
+      let buf=[];
+      block.forEach(line=>{ if(buf.length && buf.join('\n').length+1+line.length>DC_LIMIT){ parts.push(buf.join('\n')); buf=[]; } buf.push(line); });
+      if(buf.length) cu.push(buf.join('\n'));
+    } else cu.push(txt);
+  });
+  if(cu.length) parts.push(cu.join('\n\n'));
+  return parts;
+}
+function tabText(w,c){
+  const P=buildParts(w,c);
+  return '<div class="panel"><h2>디스코드용 결과</h2><p class="hint">'+(P.length<2?'한 번에 붙여넣을 수 있습니다.':'디스코드 2000자 제한 때문에 '+P.length+'개로 나눴습니다. 순서대로 붙여넣으세요.')+'</p>'+
+    '<div class="row" style="margin-bottom:10px">'+P.map((x,i)=>'<button class="btn pri" data-act="copyPart" data-i="'+i+'">'+(P.length<2?'결과 복사':'복사 '+(i+1)+'/'+P.length)+' ('+x.length+'자)</button>').join('')+'</div>'+
+    '<textarea class="in" readonly style="min-height:260px">'+esc(P.join('\n\n'))+'</textarea></div>';
+}
+function tabSet(w){
+  return '<div class="panel"><h2>정산 규칙</h2><div class="grid2">'+
+    '<div class="fld">회차 이름'+textIn('label',w.label)+'</div>'+
+    '<div class="fld">거래소 수수료율 (%) · 직접 거래는 0%'+numIn('settings.fee',w.settings.fee)+'</div>'+
+  '</div></div>'+
+  '<div class="panel"><h2>백업과 복원</h2><p class="hint">데이터는 이 브라우저에만 자동 저장됩니다. 기기를 바꾸거나 브라우저 데이터를 지우기 전에 백업을 복사해 두세요.</p>'+
+    '<div class="row"><button class="btn pri" data-act="backup">백업 복사</button><button class="btn" data-act="restoreBox">붙여넣어 복원</button></div></div>'+
+  '<div class="panel"><h2>초기화</h2><p class="hint">모든 회차를 지우고 빈 상태로 시작합니다.</p><button class="btn danger" data-act="wipe" data-arm="1">전체 초기화</button></div>';
+}
+function renderTab(){
+  const w=cur(), c=calc(w); LAST=c;
+  const v=$('#view');
+  v.innerHTML=TAB==='roster'?tabRoster(w):TAB==='sales'?tabSales(w,c):TAB==='spr'?tabSpr(w,c):TAB==='dist'?tabDist(w,c):TAB==='text'?tabText(w,c):tabSet(w);
+}
+function viewSales(w,c){
+  const sold=c.sales.filter(r=>!r.pending);
+  const rows=sold.map(r=>'<tr><td>'+esc(r.item)+'</td><td class="r">'+fmt(r.qty)+'</td><td>'+esc(r.buyer)+'</td><td class="r">'+fmt(r.net)+'</td></tr>').join('');
+  const wait=c.sales.filter(r=>r.pending).map(r=>esc(r.item)).join(', ');
+  const sp=c.sprinkles.map(p=>esc(p.to)+' '+fmt(p.count)+'개 ('+fmt(p.amount)+')').join(' · ');
+  return '<div class="panel"><h2>판매 내역</h2><div class="tw"><table><thead><tr><th>물품</th><th class="r">수량</th><th>구매자</th><th class="r">수령액</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td>합계</td><td></td><td></td><td class="r">'+fmt(c.total)+'</td></tr></tfoot></table></div>'+
+    (wait?'<p class="hint" style="margin-top:8px">미판매 드랍템: '+wait+'</p>':'')+(sp?'<p class="hint" style="margin:0">뿌리기: '+sp+'</p>':'')+'</div>';
+}
+function render(){
+  if(VIEW){
+    document.body.classList.add('view');
+    const w=VIEW, c=calc(w); LAST=c; renderStrip(c);
+    $('#view').innerHTML='<div class="vbar">읽기 전용 · 정산 담당자가 공유한 내용입니다'+(VMETA&&VMETA.at?' · 갱신 '+esc(VMETA.at):'')+'</div>'+tabDist(w,c)+viewSales(w,c);
+    return;
+  }
+  document.body.classList.remove('view');
+  renderHead(); renderTab();
+}
+function refreshLive(){
+  const w=cur(), c=calc(w); LAST=c;
+  renderStrip(c);
+  $$('[data-net]').forEach(el=>{ const r=c.sales[+el.dataset.net]; if(r){ el.innerHTML='<b>'+fmt(r.net)+'</b>'; el.parentNode.classList.toggle('pend',r.pending); } });
+  $$('[data-spamt]').forEach(el=>{ const r=c.sprinkles[+el.dataset.spamt]; if(r) el.innerHTML='<b>'+fmt(r.amount)+'</b>'; });
+  const set=(k,v)=>$$('[data-sum="'+k+'"]').forEach(el=>{el.textContent=v;});
+  set('net',fmt(c.total)); set('sp',fmt(c.spTotal)); set('spcount',fmt(sum(w.sprinkles,p=>num(p.count)))+'개');
+}
+
+/* ---------- actions ---------- */
+const armed=new WeakMap();
+function armGuard(btn){
+  if(!btn.dataset.arm) return true;
+  if(armed.get(btn)){ clearTimeout(armed.get(btn).t); armed.delete(btn); btn.classList.remove('armed'); btn.textContent=btn.dataset.label; return true; }
+  btn.dataset.label=btn.textContent; btn.textContent='한 번 더 누르면 실행'; btn.classList.add('armed');
+  armed.set(btn,{t:setTimeout(()=>{ btn.classList.remove('armed'); btn.textContent=btn.dataset.label; armed.delete(btn); },3000)});
+  return false;
+}
+function todayLabel(){ const d=new Date(); return (d.getMonth()+1)+'월 '+d.getDate()+'일 혼테일'; }
+function importState(text){
+  try{
+    const s=JSON.parse(text);
+    if(!validState(s)){ toast('올바른 백업이 아닙니다.'); return false; }
+    S=s; if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
+    save(); render(); toast('복원했습니다.'); return true;
+  }catch(e){ toast('백업을 읽지 못했습니다.'); return false; }
+}
+document.addEventListener('click',e=>{
+  const tb=e.target.closest('[data-tab]');
+  if(tb){ TAB=tb.dataset.tab; renderHead(); renderTab(); return; }
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  if(!armGuard(b)) return;
+  const act=b.dataset.act, w=cur(), i=+b.dataset.i;
+  switch(act){
+    case 'shareSnap':{
+      if(!SHDB){ toast('공유 저장소에 연결되지 않았습니다.'); break; }
+      const d=new Date(), pad=n=>String(n).padStart(2,'0');
+      const at=(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+      SHDB.doc('share/current').set({label:w.label,at:at,week:JSON.stringify(w)}).then(()=>toast('공유 내용을 갱신했습니다. ('+at+')'),()=>toast('공유 갱신에 실패했습니다.'));
+      break; }
+    case 'newWeek':{ const nw=blankWeek(todayLabel(),w); S.weeks.push(nw); S.cur=nw.id; save(); render(); toast('새 회차를 만들었습니다. 명단과 설정은 이전 회차에서 복사됐습니다.'); break; }
+    case 'delWeek':{
+      if(S.weeks.length<=1){ const nw=blankWeek(todayLabel(),null); S.weeks=[nw]; S.cur=nw.id; }
+      else{ S.weeks=S.weeks.filter(x=>x.id!==w.id); S.cur=S.weeks[S.weeks.length-1].id; }
+      save(); render(); break; }
+    case 'addMember': w.members.push(mem('', '1파티')); save(); renderHead(); renderTab(); { const ins=$$('[data-f$=".name"]'); if(ins.length) ins[ins.length-1].focus(); } break;
+    case 'delMember': w.members.splice(i,1); save(); renderHead(); renderTab(); break;
+    case 'bulkMembers':
+      openModal('<h2>여러 명 붙여넣기</h2><p class="hint">한 줄에 한 명씩 「닉네임, 파티(1/2/3/손님), 메모」 순서로 적습니다. 파티와 메모는 생략할 수 있습니다.</p><textarea class="in" id="bulkTa" placeholder="예시닉1, 1, 파티장"></textarea><div class="row" style="margin-top:10px"><button class="btn pri" data-act="bulkApply">추가</button><button class="btn" data-act="closeModal">취소</button></div>');
+      break;
+    case 'bulkApply':{
+      let n=0;
+      ($('#bulkTa').value||'').split('\n').forEach(l=>{
+        const p=l.split(/[,\t]/).map(x=>x.trim()); if(!p[0]) return;
+        const party=/^[123]/.test(p[1]||'')?(p[1][0]+'파티'):(/손님/.test(p[1]||'')?'손님':'1파티');
+        w.members.push(mem(p[0],party,p[2]||'',party==='손님'?'제외':'분배')); n++;
+      });
+      closeModal(); save(); renderHead(); renderTab(); toast(n+'명을 추가했습니다.'); break; }
+    case 'closeModal': closeModal(); break;
+    case 'addSale': w.sales.push({item:'',qty:1,unit:0,method:'거래소',fee:'',buyer:'',note:''}); save(); renderHead(); renderTab(); { const ins=$$('[data-f$=".item"]'); if(ins.length) ins[ins.length-1].focus(); } break;
+    case 'delSale': w.sales.splice(i,1); save(); renderHead(); renderTab(); break;
+    case 'addSpr': w.sprinkles.push({to:'',count:1}); save(); renderHead(); renderTab(); break;
+    case 'delSpr': w.sprinkles.splice(i,1); save(); renderHead(); renderTab(); break;
+    case 'copyPart':{ const P=buildParts(w,calc(w)); const k=Math.min(P.length-1,i||0); copyText(P[k],P.length>1?('결과 '+(k+1)+'/'+P.length+'을 복사했습니다.'):'결과를 복사했습니다.'); break; }
+    case 'backup': copyText(JSON.stringify(S),'백업을 복사했습니다. 메모장 등에 붙여넣어 보관하세요.'); break;
+    case 'restoreBox':
+      openModal('<h2>붙여넣어 복원</h2><p class="hint">복사해 둔 백업을 붙여넣으세요. 현재 데이터는 덮어쓰기됩니다.</p><textarea class="in" id="restoreTa"></textarea><div class="row" style="margin-top:10px"><button class="btn pri" data-act="restoreApply">복원</button><button class="btn" data-act="closeModal">취소</button></div>');
+      break;
+    case 'restoreApply': if(importState($('#restoreTa').value)) closeModal(); break;
+    case 'wipe':{ const nw=blankWeek(todayLabel(),null); S={v:1,cur:nw.id,weeks:[nw]}; save(); render(); toast('초기화했습니다.'); break; }
+  }
+});
+function onField(e){
+  const t=e.target; if(!t.dataset||!t.dataset.f) return;
+  const w=cur(); let v;
+  if(t.type==='checkbox') v=t.checked;
+  else if(t.dataset.t==='feeov') v=String(t.value).trim()===''?'':num(t.value);
+  else if(t.dataset.t==='num') v=num(t.value);
+  else v=t.value;
+  setPath(w,t.dataset.f,v);
+  save();
+  if(t.dataset.rr && e.type==='change'){ renderHead(); renderTab(); } else refreshLive();
+  if(t.dataset.f==='label'){ const o=$('#weekSel option[value="'+w.id+'"]'); if(o) o.textContent=v; }
+}
+document.addEventListener('input',onField);
+document.addEventListener('change',onField);
+document.addEventListener('focusout',e=>{ const t=e.target; if(t.dataset && t.dataset.t==='num') t.value=fmtIn(num(t.value)); });
+document.addEventListener('change',e=>{ if(e.target.id==='weekSel'){ S.cur=e.target.value; save(); render(); } });
+$('#modal').addEventListener('mousedown',e=>{ if(e.target.id==='modal') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+render();
+})();
+</script>
+</body>
+</html>
