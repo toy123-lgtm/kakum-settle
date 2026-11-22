@@ -606,6 +606,20 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       w3.sales.forEach(r=>{ if(P[r.item] && !num(r.unit)) r.unit=P[r.item]; });
     }
   }
+  if(!S.seedsDone.includes('pr-1122b')){
+    S.seedsDone.push('pr-1122b'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      const P1={'라투핸더':400000,'핼버드':400000,'커세어':340000,'다이몬의 완드':360000,'카사크로우':400000,'캐스터스':450000,'다크아룬드':350000,'코브라스티어':400000};
+      const P2={'다크아룬드':350000,'다크 샬리트':350000,'라투핸더':400000,'카사크로우':400000,'케이그':310000,'캐스터스':450000};
+      const RN={'라투핸더':'라 투핸더','카사크로우':'카사 크로우','다크아룬드':'다크 아룬드','핼버드':'헬버드'};
+      w3.sales.forEach(r=>{
+        const P=String(r.trt)==='1'?P1:P2;
+        if(P[r.item] && !num(r.unit)){ r.unit=P[r.item]; r.method='상점·직접'; }
+        if(RN[r.item]) r.item=RN[r.item];
+      });
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
