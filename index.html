@@ -625,6 +625,18 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
     const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
     if(w3) w3.sales.forEach(r=>{ if(r.item==='커세어' && String(r.trt)==='2' && !num(r.unit)){ r.unit=340000; r.method='상점·직접'; } });
   }
+  if(!S.seedsDone.includes('fx-1122a')){
+    S.seedsDone.push('fx-1122a'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      w3.sales.forEach(r=>{ if(r.item==='확정 투구' && /별빛수집가|봄이츄/.test(r.note||'')) r.trt='2'; });
+      w3.sales=w3.sales.filter(r=>!(r.item==='확정 투구' && /구매자 미입력/.test(r.note||'')));
+      w3.sales.forEach(r=>{
+        if(r.item==='순록의 우유') r.unit=5400;
+        if(/^\[마북\]/.test(r.item) && !num(r.unit)) r.note='미판매';
+      });
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
