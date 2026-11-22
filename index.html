@@ -641,6 +641,15 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
     S.seedsDone.push('st-1122'); changed=true;
     S.weeks.forEach(w=>{ if(w.label==='11월 22일 회차' || w.id===SEED_ID) w.settings.recruitBase=60000000; });
   }
+  if(!S.seedsDone.includes('mb-1122')){
+    S.seedsDone.push('mb-1122'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      const un=w3.sales.filter(r=>/^\[마북\]/.test(r.item) && !num(r.unit));
+      w3.sales=w3.sales.filter(r=>un.indexOf(r)<0);
+      if(un.length) w3.memo=(w3.memo?w3.memo+'\n':'')+'마북 미판매: '+un.map(r=>r.item.replace('[마북] ','')+'('+r.trt+'트)').join(', ');
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
