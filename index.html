@@ -576,6 +576,18 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       });
     }
   }
+  if(!S.seedsDone.includes('dr-1122b')){
+    S.seedsDone.push('dr-1122b'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      w3.sales.forEach(r=>{
+        if(r.item==='버스크 20') r.item='[마북] 버스크 20';
+        if(r.item==='혼돈의 주문서' && String(r.trt)==='1') r.unit=16500000;
+      });
+      if(!w3.sales.some(r=>r.item==='혼돈의 주문서' && String(r.trt)==='2'))
+        w3.sales.push({item:'혼돈의 주문서',trt:'2',method:'거래소',qty:1,unit:16500000,holder:'',note:''});
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
