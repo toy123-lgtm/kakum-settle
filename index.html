@@ -567,6 +567,15 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       w3.expenses.push({type:'뿌리기',name:'뿌리기 2트 (하니뀽 2개)',to:'하니뀽',amount:1000000,base:0,note:'개당 50만 × 2'});
     }
   }
+  if(!S.seedsDone.includes('dr-1122a')){
+    S.seedsDone.push('dr-1122a'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      [['순록의 우유',66],['혼돈의 주문서',1],['라투핸더',1],['엘릭서',49],['[마북] 크로스보우 엑스퍼트 30',1],['버스크 20',1],['황혼의 이슬',65],['핼버드',1],['커세어',1],['[마북] 연막탄 20',1],['다이몬의 완드',1],['카사크로우',1],['캐스터스',1],['다크아룬드',1],['코브라스티어',1],['파워 엘릭서',36]].forEach(a=>{
+        w3.sales.push({item:a[0],trt:'1',method:'거래소',qty:a[1],unit:0,holder:'',note:''});
+      });
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
