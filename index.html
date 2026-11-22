@@ -620,6 +620,11 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       });
     }
   }
+  if(!S.seedsDone.includes('pr-1122c')){
+    S.seedsDone.push('pr-1122c'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3) w3.sales.forEach(r=>{ if(r.item==='커세어' && String(r.trt)==='2' && !num(r.unit)){ r.unit=340000; r.method='상점·직접'; } });
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
