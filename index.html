@@ -637,6 +637,10 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       });
     }
   }
+  if(!S.seedsDone.includes('st-1122')){
+    S.seedsDone.push('st-1122'); changed=true;
+    S.weeks.forEach(w=>{ if(w.label==='11월 22일 회차' || w.id===SEED_ID) w.settings.recruitBase=60000000; });
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
