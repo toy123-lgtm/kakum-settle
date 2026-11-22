@@ -522,6 +522,19 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
     }
     if(w2.memo==='내판 방식: 공대원 지인은 당일 시세의 50% 가격으로 투구 구매\n3순위 투구 오늘 시세 5,000만, 지인가 2,500만 (드랍은 확률, 드랍될 때만 판매)\n1트 손님 버섴뀽 (하니뀽 지인), 2트 손님 TheEnd (수비표창수저 지인)\n알버프 400만은 버섴뀽의 투구 대금에서 차감 (현재 지급·수령 없음, 투구 획득 시 버섴뀽 입금 2,100만)\n영메(영웅의메아리): 표웅식이 별도 구입 (판매자 포도알2개)\n확정 투구 1트: 1순위 빈타니, 정가 구매, 구인자 좌우중간\n손님 입장: 1~3번 (1번 원정대장)'){ w2.memo=seedWeek1115().memo; changed=true; }
   }
+  if(!S.seedsDone.includes('seed-1122')){
+    S.seedsDone.push('seed-1122'); changed=true;
+    const src=S.weeks.find(w=>w.id===SEED_ID)||S.weeks[S.weeks.length-1];
+    if(!S.weeks.some(w=>w.label==='11월 22일 회차')){
+      const nw=blankWeek('11월 22일 회차',src);
+      nw.payer=src.payer||'';
+      nw.expenses=[
+        {type:'실비',name:'알버프 구입',to:'',amount:5000000,base:0,note:'구매 (판매자 미정)'},
+        {type:'실비',name:'영메 구입',to:'표웅식',amount:1500000,base:0,note:'표웅식 환급 150만'}
+      ];
+      S.weeks.push(nw);
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
