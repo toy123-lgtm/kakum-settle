@@ -548,6 +548,14 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       const m=w3.members.find(x=>x.name==='새싹대장님'); if(m) m.r1=0;
     }
   }
+  if(!S.seedsDone.includes('in-1122b')){
+    S.seedsDone.push('in-1122b'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      w3.sales.forEach(r=>{ if(r.item==='확정 투구' && !num(r.unit)) r.unit=60000000; });
+      w3.expenses.forEach(e=>{ if(e.type==='구인' && !num(e.base)) e.base=60000000; });
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
