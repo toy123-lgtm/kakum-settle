@@ -680,6 +680,19 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
     const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
     if(w3) w3.sales.forEach(r=>{ if(r.item==='3순위 투구' && String(r.trt)==='2' && /미입력/.test(r.note||'')) r.note='뽀붐'; });
   }
+  if(!S.seedsDone.includes('rs-1122')){
+    S.seedsDone.push('rs-1122'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      const ord=[['꼴동','히어로','공대원'],['또추링','히어로','공대원'],['효탄','히어로','공대원'],['새싹대장님','바이퍼','공대원'],['좌우중간','다크나이트','공대원'],['뀨쀼토','팔라딘','공대원'],['의적섀도어','섀도어','공대원'],['전사설계사','다크나이트','공대원'],['신구이','다크나이트','용병'],['하니뀽','나이트로드','공대원'],['수비표창수저','나이트로드','공대원'],['밍또깅표도','나이트로드','공대원'],['표웅식','나이트로드','공대원'],['스킬이뭐에용','나이트로드','공대원'],['고삼면','나이트로드','공대원'],['쿠리니','비숍','공대원'],['XingXing','신궁','공대원'],['토벤이국룰','보우마스터','공대원'],['달이잠든바다','비숍','공대원'],['뀨잉꾸잉','비숍','공대원'],['최쭌규','비숍','공대원']];
+      const old={}; w3.members.forEach(m=>{ old[m.name]=m; });
+      w3.members=ord.map(a=>{
+        const o=old[a[0]]; const m=newMember(a[0],a[1],a[2]);
+        if(o){ m.r1=o.r1; m.r2=o.r2; m.adjust=o.adjust||0; }
+        return m;
+      });
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
