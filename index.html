@@ -658,6 +658,14 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       w2.memo=(w2.memo?w2.memo+'\n':'')+'밍또깅표도 분배 포기: 분배금 42,141,729를 나머지 20명에게 1/n 추가 분배 (1인 +2,107,086, 잔액 9는 분배 담당)';
     }
   }
+  if(!S.seedsDone.includes('adj-1115-undo')){
+    S.seedsDone.push('adj-1115-undo'); changed=true;
+    const w2=S.weeks.find(w=>w.id===SEED_ID);
+    if(w2){
+      w2.members.forEach(m=>{ if(m.name==='밍또깅표도' ? num(m.adjust)===-42141729 : num(m.adjust)===2107086) m.adjust=0; });
+      if(typeof w2.memo==='string') w2.memo=w2.memo.split('\n').filter(l=>l.indexOf('밍또깅표도 분배 포기')<0).join('\n');
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
