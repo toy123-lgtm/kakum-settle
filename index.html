@@ -219,8 +219,9 @@ function calc(w){
   const dedBy={}; (w.purchases||[]).forEach(p=>{ const b=String(p.buyer||'').trim(); if(b) dedBy[b]=(dedBy[b]||0)+num(p.amount); });
   const rows=att.map((x,i)=>{
     const m=x.m, name=String(m.name).trim();
-    const s1=Math.floor(unit1*pct(m.r1)+1e-6), s2=Math.floor(unit2*pct(m.r2)+1e-6);
-    const share=s1+s2, adjust=num(m.adjust), deduct=dedBy[name]||0;
+    const f1=unit1*pct(m.r1), f2=unit2*pct(m.r2);
+    const share=Math.floor(f1+f2+1e-6), s1=Math.min(share,Math.floor(f1+1e-6)), s2=share-s1;
+    const  adjust=num(m.adjust), deduct=dedBy[name]||0;
     const real=share+adjust-deduct, exp=expBy[name]||0;
     return {no:i+1,mi:x.mi,extra:false,name:name,job:m.job||'',kind:m.kind||'',r1:num(m.r1),r2:num(m.r2),
       s1:s1,s2:s2,share:share,adjust:adjust,deduct:deduct,real:real,exp:exp,total:real+exp,paid:!!m.paid,p1:0,p2:0};
@@ -664,6 +665,14 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
     if(w2){
       w2.members.forEach(m=>{ if(m.name==='밍또깅표도' ? num(m.adjust)===-42141729 : num(m.adjust)===2107086) m.adjust=0; });
       if(typeof w2.memo==='string') w2.memo=w2.memo.split('\n').filter(l=>l.indexOf('밍또깅표도 분배 포기')<0).join('\n');
+    }
+  }
+  if(!S.seedsDone.includes('mt-1122')){
+    S.seedsDone.push('mt-1122'); changed=true;
+    const w3=S.weeks.find(w=>w.label==='11월 22일 회차');
+    if(w3){
+      const m=w3.members.find(x=>x.name==='밍또깅표도'); if(m){ m.r1=0; m.r2=0; }
+      w3.memo=(w3.memo?w3.memo+'\n':'')+'밍또깅표도 분배 포기: 분배율 0%, 몫은 나머지 인원이 분배율 비례로 분배';
     }
   }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
