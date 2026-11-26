@@ -650,6 +650,14 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       if(un.length) w3.memo=(w3.memo?w3.memo+'\n':'')+'마북 미판매: '+un.map(r=>r.item.replace('[마북] ','')+'('+r.trt+'트)').join(', ');
     }
   }
+  if(!S.seedsDone.includes('adj-1115')){
+    S.seedsDone.push('adj-1115'); changed=true;
+    const w2=S.weeks.find(w=>w.id===SEED_ID);
+    if(w2){
+      w2.members.forEach(m=>{ if(m.name==='밍또깅표도') m.adjust=-42141729; else if(m.go) m.adjust=2107086; });
+      w2.memo=(w2.memo?w2.memo+'\n':'')+'밍또깅표도 분배 포기: 분배금 42,141,729를 나머지 20명에게 1/n 추가 분배 (1인 +2,107,086, 잔액 9는 분배 담당)';
+    }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
