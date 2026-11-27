@@ -693,6 +693,11 @@ if(!Array.isArray(S.seedsDone)) S.seedsDone=[];
       });
     }
   }
+  if(!S.seedsDone.includes('pd-1115-a')){
+    S.seedsDone.push('pd-1115-a'); changed=true;
+    const w2=S.weeks.find(w=>w.id===SEED_ID);
+    if(w2){ const m=w2.members.find(x=>x.name==='의적섀도어'); if(m) m.paid=true; }
+  }
   if(changed){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 })();
 if(!S.weeks.find(w=>w.id===S.cur)) S.cur=S.weeks[0].id;
